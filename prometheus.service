@@ -1,0 +1,18 @@
+# download prometheus to /opt location from google using wget
+# then untar and make soft link -> ln -s prometheus-3.9.1.linux-amd64 prometheus 
+
+# save this and text in vi /etc/systemd/system/prometheus.service
+# then enable it on systemctl enable prometheus
+# then run it on systemctl start prometheus
+
+[Unit]
+Description=prometheus service
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/opt/prometheus/prometheus --config.file=/opt/prometheus/prometheus.yml
+
+[Install]
+WantedBy=multi-user.target
