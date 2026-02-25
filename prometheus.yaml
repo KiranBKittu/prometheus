@@ -1,0 +1,62 @@
+# Take prometheus.yaml from /opt/prometheus and add below - job_name=node then restart prometheus now we test with up we can see new node added.
+# my global config
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+
+#################==================== for static
+# scrape_configs:
+#   - job_name: "prometheus"
+#     static_configs:
+#       - targets: ["localhost:9090"]
+#         labels:
+#           app: "prometheus"
+
+#   - job_name: "node-1"
+#     static_configs:
+#       - targets: ["18.234.149.143:9100"]
+#         labels:
+#           app: "node-1"
+#           name: "node-1"
+####################================== for static
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "ec2-nodes"
+    ec2_sd_configs:
+      - region: us-east-1
+        port: 9100
+        filters:
+          - name: "tag:Monitoring"
+            values: ["true"]
+
+    relabel_configs:
+      - source_labels: [__meta_ec2_private_ip]
+        target_label: __address__
+        replacement: "$1:9100"
+
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: instance
+
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance_id
+
+# in ec2 instance need to add tags sam me like above files Monitoring = true if not is wont connect to that server

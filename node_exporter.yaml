@@ -1,0 +1,20 @@
+# This step we have to do at premetheus server location only
+# download it node_exporter and run it at /opt 
+# wget https://github.com/prometheus/node_exporter/releases/download/v1.8.0/node_exporter-1.8.0.linux-amd64.tar.gz
+#tar xvf node_exporter-1.8.0.linux-amd64.tar.gz
+#cd node_exporter-1.8.0.linux-amd64
+# create soft link ln -s node_exporter-1.8.0.linux-amd64 node_exporter
+# add it vi /etc/systemd/system/node_exporter.service
+# now start the server systemctl start node_exporter.service then systemctl enable node_exporter.service
+# to check netstat -nltp
+[Unit]
+Description=Adding node to Prometheus service
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=node_exporter/node_exporter
+
+[Install]
+WantedBy=multi-user.target
